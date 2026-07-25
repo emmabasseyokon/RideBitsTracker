@@ -16,7 +16,7 @@ export const STATUS_STYLES: Record<ReleaseStatus, string> = {
 
 export const STATUSES_BY_ENVIRONMENT: Record<Environment, ReleaseStatus[]> = {
   production: ["current_version", "in_production", "rolled_back"],
-  staging: ["current_version", "in_production"],
+  staging: ["current_version", "in_production", "rolled_back"],
 };
 
 export const ENVIRONMENT_LABELS: Record<Environment, string> = {

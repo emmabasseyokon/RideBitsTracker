@@ -62,7 +62,7 @@ export function ReleaseTracker({
       {creating && (
         <ReleaseFormSheet
           mode="create"
-          environment={environment}
+          environment="staging"
           onClose={() => setCreating(false)}
         />
       )}
