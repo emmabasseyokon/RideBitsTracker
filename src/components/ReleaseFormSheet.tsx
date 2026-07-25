@@ -11,12 +11,29 @@ type Props =
   | { mode: "edit"; environment: Environment; release: Release; onClose: () => void };
 
 export function ReleaseFormSheet({ mode, environment, release, onClose }: Props) {
-  const statuses = STATUSES_BY_ENVIRONMENT[environment];
+  const otherEnvironment: Environment =
+    environment === "production" ? "staging" : "production";
+
+  const [targetEnvironment, setTargetEnvironment] = useState<Environment | "">("");
+  const effectiveEnvironment: Environment =
+    mode === "edit" && targetEnvironment ? targetEnvironment : environment;
+  const statuses = STATUSES_BY_ENVIRONMENT[effectiveEnvironment];
+
   const [status, setStatus] = useState<ReleaseStatus>(release?.status ?? statuses[0]);
   const [notes, setNotes] = useState(release?.notes ?? "");
   const [error, setError] = useState<string | null>(null);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [isPending, startTransition] = useTransition();
+
+  function handleMoveChange(value: string) {
+    const next = value as Environment | "";
+    setTargetEnvironment(next);
+    const nextEnvironment = next || environment;
+    const validStatuses = STATUSES_BY_ENVIRONMENT[nextEnvironment];
+    if (!validStatuses.includes(status)) {
+      setStatus(validStatuses[0]);
+    }
+  }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -26,7 +43,11 @@ export function ReleaseFormSheet({ mode, environment, release, onClose }: Props)
         if (mode === "create") {
           await createRelease({ environment, status, notes });
         } else {
-          await updateRelease(release.id, { status, notes });
+          await updateRelease(release.id, {
+            status,
+            notes,
+            ...(targetEnvironment ? { environment: targetEnvironment } : {}),
+          });
         }
         onClose();
       } catch (err) {
@@ -62,11 +83,32 @@ export function ReleaseFormSheet({ mode, environment, release, onClose }: Props)
         <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-neutral-300 dark:bg-neutral-700" />
 
         <p className="mb-1 text-xs font-medium uppercase tracking-wide text-neutral-500">
-          {ENVIRONMENT_LABELS[environment]}
+          {targetEnvironment
+            ? `${ENVIRONMENT_LABELS[environment]} → ${ENVIRONMENT_LABELS[targetEnvironment]}`
+            : ENVIRONMENT_LABELS[environment]}
         </p>
         <h2 className="mb-4 text-lg font-semibold">
           {mode === "create" ? "New release" : release.version}
         </h2>
+
+        {mode === "edit" && (
+          <>
+            <label htmlFor="move-to" className="mb-1 block text-sm font-medium">
+              Move to
+            </label>
+            <select
+              id="move-to"
+              value={targetEnvironment}
+              onChange={(e) => handleMoveChange(e.target.value)}
+              className="mb-4 w-full rounded-lg border border-neutral-300 bg-white p-2.5 text-sm dark:border-neutral-700 dark:bg-neutral-950"
+            >
+              <option value=""></option>
+              <option value={otherEnvironment}>
+                {ENVIRONMENT_LABELS[otherEnvironment]}
+              </option>
+            </select>
+          </>
+        )}
 
         <label htmlFor="status" className="mb-1 block text-sm font-medium">
           Status

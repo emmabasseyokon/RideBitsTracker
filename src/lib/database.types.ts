@@ -16,7 +16,9 @@ export type Release = {
 export type ReleaseInsert = Pick<Release, "environment" | "status"> &
   Partial<Pick<Release, "notes">>;
 
-export type ReleaseUpdate = Partial<Pick<Release, "status" | "notes">>;
+export type ReleaseUpdate = Partial<
+  Pick<Release, "status" | "notes" | "environment">
+>;
 
 export type Database = {
   public: {

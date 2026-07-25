@@ -20,11 +20,15 @@ export async function createRelease(input: {
 
 export async function updateRelease(
   id: string,
-  input: { status: ReleaseStatus; notes?: string },
+  input: { status: ReleaseStatus; notes?: string; environment?: Environment },
 ) {
   const { error } = await supabase
     .from("releases")
-    .update({ status: input.status, notes: input.notes?.trim() || null })
+    .update({
+      status: input.status,
+      notes: input.notes?.trim() || null,
+      ...(input.environment ? { environment: input.environment } : {}),
+    })
     .eq("id", id);
   if (error) throw new Error(error.message);
   revalidatePath("/");
