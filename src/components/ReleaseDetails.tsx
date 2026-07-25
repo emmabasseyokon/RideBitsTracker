@@ -70,7 +70,7 @@ export function ReleaseDetails({ release }: { release: Release }) {
           {ENVIRONMENT_LABELS[release.environment]}
         </p>
         <p className="text-xs text-neutral-500 dark:text-neutral-400">
-          Created {formatRelativeTime(release.created_at)}
+          Released {formatRelativeTime(release.created_at)}
         </p>
         {release.notes && (
           <div>

@@ -3,8 +3,7 @@
 import { useState, useTransition } from "react";
 import type { Environment, Release, ReleaseStatus } from "@/lib/database.types";
 import { STATUS_LABELS, STATUSES_BY_ENVIRONMENT, ENVIRONMENT_LABELS } from "@/lib/status";
-import { createRelease, deleteRelease, updateRelease } from "@/lib/actions";
-import { ConfirmDeleteDialog } from "./ConfirmDeleteDialog";
+import { createRelease, updateRelease } from "@/lib/actions";
 
 type Props =
   | { mode: "create"; environment: Environment; release?: undefined; onClose: () => void }
@@ -22,7 +21,6 @@ export function ReleaseFormSheet({ mode, environment, release, onClose }: Props)
   const [status, setStatus] = useState<ReleaseStatus>(release?.status ?? statuses[0]);
   const [notes, setNotes] = useState(release?.notes ?? "");
   const [error, setError] = useState<string | null>(null);
-  const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   function handleMoveChange(value: string) {
@@ -59,20 +57,6 @@ export function ReleaseFormSheet({ mode, environment, release, onClose }: Props)
         }
         onClose();
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Something went wrong");
-      }
-    });
-  }
-
-  function handleDelete() {
-    if (mode !== "edit") return;
-    setError(null);
-    startTransition(async () => {
-      try {
-        await deleteRelease(release.id);
-        onClose();
-      } catch (err) {
-        setConfirmingDelete(false);
         setError(err instanceof Error ? err.message : "Something went wrong");
       }
     });
@@ -147,35 +131,14 @@ export function ReleaseFormSheet({ mode, environment, release, onClose }: Props)
 
         {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
 
-        <div className="flex gap-2">
-          <button
-            type="submit"
-            disabled={isPending}
-            className="flex-1 rounded-lg bg-neutral-900 py-3 text-sm font-semibold text-white disabled:opacity-50 dark:bg-neutral-50 dark:text-neutral-900"
-          >
-            {mode === "create" ? "Create release" : "Save"}
-          </button>
-          {mode === "edit" && (
-            <button
-              type="button"
-              onClick={() => setConfirmingDelete(true)}
-              disabled={isPending}
-              className="rounded-lg border border-red-200 px-4 py-3 text-sm font-semibold text-red-600 disabled:opacity-50 dark:border-red-900 dark:text-red-400"
-            >
-              Delete
-            </button>
-          )}
-        </div>
+        <button
+          type="submit"
+          disabled={isPending}
+          className="w-full rounded-lg bg-neutral-900 py-3 text-sm font-semibold text-white disabled:opacity-50 dark:bg-neutral-50 dark:text-neutral-900"
+        >
+          {mode === "create" ? "Create release" : "Save"}
+        </button>
       </form>
-
-      {confirmingDelete && mode === "edit" && (
-        <ConfirmDeleteDialog
-          version={release.version}
-          isPending={isPending}
-          onConfirm={handleDelete}
-          onCancel={() => setConfirmingDelete(false)}
-        />
-      )}
     </div>
   );
 }
