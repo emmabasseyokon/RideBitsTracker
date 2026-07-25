@@ -7,7 +7,6 @@ import { EnvironmentTabs } from "./EnvironmentTabs";
 import { ReleaseCard } from "./ReleaseCard";
 import { ReleaseFormSheet } from "./ReleaseFormSheet";
 import { ThemeToggle } from "./ThemeToggle";
-import { InstallButton } from "./InstallButton";
 
 export function ReleaseTracker({
   initialReleases,
@@ -28,10 +27,7 @@ export function ReleaseTracker({
     <main className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-4 p-4">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">RideBits Release Tracker</h1>
-        <div className="flex items-center gap-2">
-          <InstallButton />
-          <ThemeToggle />
-        </div>
+        <ThemeToggle />
       </div>
 
       <EnvironmentTabs active={environment} onChange={setEnvironment} />
