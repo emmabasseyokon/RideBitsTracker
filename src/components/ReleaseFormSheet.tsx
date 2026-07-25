@@ -35,6 +35,14 @@ export function ReleaseFormSheet({ mode, environment, release, onClose }: Props)
     }
   }
 
+  function handleStatusChange(value: string) {
+    const next = value as ReleaseStatus;
+    setStatus(next);
+    if (mode === "edit" && next === "rolled_back" && environment === "production") {
+      setTargetEnvironment("staging");
+    }
+  }
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
@@ -116,7 +124,7 @@ export function ReleaseFormSheet({ mode, environment, release, onClose }: Props)
         <select
           id="status"
           value={status}
-          onChange={(e) => setStatus(e.target.value as ReleaseStatus)}
+          onChange={(e) => handleStatusChange(e.target.value)}
           className="mb-4 w-full rounded-lg border border-neutral-300 bg-white p-2.5 text-sm dark:border-neutral-700 dark:bg-neutral-950"
         >
           {statuses.map((s) => (
