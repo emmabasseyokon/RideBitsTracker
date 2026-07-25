@@ -28,10 +28,12 @@ export async function updateRelease(
     .eq("id", id);
   if (error) throw new Error(error.message);
   revalidatePath("/");
+  revalidatePath(`/releases/${id}`);
 }
 
 export async function deleteRelease(id: string) {
   const { error } = await supabase.from("releases").delete().eq("id", id);
   if (error) throw new Error(error.message);
   revalidatePath("/");
+  revalidatePath(`/releases/${id}`);
 }

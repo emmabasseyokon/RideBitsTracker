@@ -8,8 +8,6 @@ import { ReleaseCard } from "./ReleaseCard";
 import { ReleaseFormSheet } from "./ReleaseFormSheet";
 import { ThemeToggle } from "./ThemeToggle";
 
-type Sheet = { mode: "create" } | { mode: "edit"; release: Release } | null;
-
 export function ReleaseTracker({
   initialReleases,
   loadError,
@@ -18,7 +16,7 @@ export function ReleaseTracker({
   loadError: string | null;
 }) {
   const [environment, setEnvironment] = useState<Environment>("production");
-  const [sheet, setSheet] = useState<Sheet>(null);
+  const [creating, setCreating] = useState(false);
 
   const releases = useMemo(
     () => initialReleases.filter((r) => r.environment === environment),
@@ -48,36 +46,24 @@ export function ReleaseTracker({
 
       <div className="flex flex-col gap-3 pb-20">
         {releases.map((release) => (
-          <ReleaseCard
-            key={release.id}
-            release={release}
-            onClick={() => setSheet({ mode: "edit", release })}
-          />
+          <ReleaseCard key={release.id} release={release} />
         ))}
       </div>
 
       <button
         type="button"
-        onClick={() => setSheet({ mode: "create" })}
+        onClick={() => setCreating(true)}
         aria-label="Add release"
         className="fixed right-6 bottom-6 flex h-14 w-14 items-center justify-center rounded-full bg-neutral-900 text-2xl leading-none text-white shadow-lg dark:bg-neutral-50 dark:text-neutral-900"
       >
         +
       </button>
 
-      {sheet?.mode === "create" && (
+      {creating && (
         <ReleaseFormSheet
           mode="create"
           environment={environment}
-          onClose={() => setSheet(null)}
-        />
-      )}
-      {sheet?.mode === "edit" && (
-        <ReleaseFormSheet
-          mode="edit"
-          environment={sheet.release.environment}
-          release={sheet.release}
-          onClose={() => setSheet(null)}
+          onClose={() => setCreating(false)}
         />
       )}
     </main>
