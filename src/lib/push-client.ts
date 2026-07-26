@@ -24,14 +24,6 @@ export async function getPushSubscriptionEndpoint(): Promise<
   return subscription?.endpoint;
 }
 
-export type PushStatus = "unsupported" | "subscribed" | "unsubscribed";
-
-export async function getPushStatus(): Promise<PushStatus> {
-  if (!pushSupported()) return "unsupported";
-  const endpoint = await getPushSubscriptionEndpoint();
-  return endpoint ? "subscribed" : "unsubscribed";
-}
-
 export async function subscribeToPushNotifications(): Promise<boolean> {
   if (!pushSupported()) return false;
 
