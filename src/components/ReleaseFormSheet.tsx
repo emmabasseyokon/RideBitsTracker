@@ -17,7 +17,12 @@ export function ReleaseFormSheet({ mode, environment, release, onClose }: Props)
   const [targetEnvironment, setTargetEnvironment] = useState<Environment | "">("");
   const effectiveEnvironment: Environment =
     mode === "edit" && targetEnvironment ? targetEnvironment : environment;
-  const statuses = STATUSES_BY_ENVIRONMENT[effectiveEnvironment];
+  const statuses =
+    mode === "create"
+      ? STATUSES_BY_ENVIRONMENT[effectiveEnvironment].filter(
+          (s) => s !== "rolled_back",
+        )
+      : STATUSES_BY_ENVIRONMENT[effectiveEnvironment];
 
   const [status, setStatus] = useState<ReleaseStatus>(release?.status ?? statuses[0]);
   const [notes, setNotes] = useState(release?.notes ?? "");
