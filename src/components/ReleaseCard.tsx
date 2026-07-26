@@ -15,7 +15,7 @@ export function ReleaseCard({ release }: { release: Release }) {
             {release.version}
           </span>
           <span className="text-xs text-neutral-500 dark:text-neutral-400">
-            {formatRelativeTime(release.created_at)}
+            Released {formatRelativeTime(release.created_at)}
           </span>
         </div>
         <StatusBadge status={release.status} />
