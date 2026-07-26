@@ -124,3 +124,23 @@ create policy "Allow all access to releases"
   for all
   using (true)
   with check (true);
+
+-- Push subscriptions: one row per browser/device that has opted in to
+-- release notifications. No user_id since there's no auth — every
+-- subscription just gets every notification.
+create table if not exists public.push_subscriptions (
+  id uuid primary key default gen_random_uuid(),
+  endpoint text not null unique,
+  p256dh text not null,
+  auth text not null,
+  created_at timestamptz not null default now()
+);
+
+alter table public.push_subscriptions enable row level security;
+
+drop policy if exists "Allow all access to push_subscriptions" on public.push_subscriptions;
+create policy "Allow all access to push_subscriptions"
+  on public.push_subscriptions
+  for all
+  using (true)
+  with check (true);

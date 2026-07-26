@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import type { Environment, Release, ReleaseStatus } from "@/lib/database.types";
 import { STATUS_LABELS, STATUSES_BY_ENVIRONMENT, ENVIRONMENT_LABELS } from "@/lib/status";
 import { createRelease, updateRelease } from "@/lib/actions";
+import { getPushSubscriptionEndpoint } from "@/lib/push-client";
 
 type Props =
   | { mode: "create"; environment: Environment; release?: undefined; onClose: () => void }
@@ -46,14 +47,19 @@ export function ReleaseFormSheet({ mode, environment, release, onClose }: Props)
     setError(null);
     startTransition(async () => {
       try {
+        const subscriberEndpoint = await getPushSubscriptionEndpoint();
         if (mode === "create") {
-          await createRelease({ environment, status, notes });
+          await createRelease({ environment, status, notes }, subscriberEndpoint);
         } else {
-          await updateRelease(release.id, {
-            status,
-            notes,
-            ...(targetEnvironment ? { environment: targetEnvironment } : {}),
-          });
+          await updateRelease(
+            release.id,
+            {
+              status,
+              notes,
+              ...(targetEnvironment ? { environment: targetEnvironment } : {}),
+            },
+            subscriberEndpoint,
+          );
         }
         onClose();
       } catch (err) {

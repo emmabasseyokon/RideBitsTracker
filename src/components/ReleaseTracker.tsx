@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import type { Environment, Release } from "@/lib/database.types";
 import { ENVIRONMENT_LABELS } from "@/lib/status";
 import { EnvironmentTabs } from "./EnvironmentTabs";
+import { NotificationToggle } from "./NotificationToggle";
 import { ReleaseCard } from "./ReleaseCard";
 import { ReleaseFormSheet } from "./ReleaseFormSheet";
 import { ThemeToggle } from "./ThemeToggle";
@@ -27,7 +28,10 @@ export function ReleaseTracker({
     <main className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-4 p-4">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">RideBits Release Tracker</h1>
-        <ThemeToggle />
+        <div className="flex items-center gap-3">
+          <NotificationToggle />
+          <ThemeToggle />
+        </div>
       </div>
 
       <EnvironmentTabs active={environment} onChange={setEnvironment} />

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import type { Release } from "@/lib/database.types";
 import { deleteRelease } from "@/lib/actions";
+import { getPushSubscriptionEndpoint } from "@/lib/push-client";
 import { ENVIRONMENT_LABELS } from "@/lib/status";
 import { formatRelativeTime } from "@/lib/time";
 import { StatusBadge } from "./StatusBadge";
@@ -23,7 +24,8 @@ export function ReleaseDetails({ release }: { release: Release }) {
     setError(null);
     startTransition(async () => {
       try {
-        await deleteRelease(release.id);
+        const subscriberEndpoint = await getPushSubscriptionEndpoint();
+        await deleteRelease(release.id, subscriberEndpoint);
         router.push("/");
       } catch (err) {
         setDeleting(false);

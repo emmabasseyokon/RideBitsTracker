@@ -20,6 +20,19 @@ export type ReleaseUpdate = Partial<
   Pick<Release, "status" | "notes" | "environment">
 >;
 
+export type PushSubscriptionRow = {
+  id: string;
+  endpoint: string;
+  p256dh: string;
+  auth: string;
+  created_at: string;
+};
+
+export type PushSubscriptionInsert = Pick<
+  PushSubscriptionRow,
+  "endpoint" | "p256dh" | "auth"
+>;
+
 export type Database = {
   public: {
     Tables: {
@@ -27,6 +40,12 @@ export type Database = {
         Row: Release;
         Insert: ReleaseInsert;
         Update: ReleaseUpdate;
+        Relationships: [];
+      };
+      push_subscriptions: {
+        Row: PushSubscriptionRow;
+        Insert: PushSubscriptionInsert;
+        Update: Partial<PushSubscriptionInsert>;
         Relationships: [];
       };
     };
